@@ -1,0 +1,11 @@
+---
+- name: Configuring Web Servers
+  hosts: webserver
+
+  tasks:
+    - name: Install Apache
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+        update_cache: yes
+      become: yes

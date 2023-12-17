@@ -42,12 +42,6 @@ resource "aws_instance" "webserver-1" {
         volume_type = "gp2"
     }
 
-    user_data = <<EOF
-#!/bin/bash
-sudo apt update -y
-sudo apt install -y apache2
-EOF
-
     tags = {
         Name = "webserver-1"
     }
@@ -66,12 +60,6 @@ resource "aws_instance" "webserver-2" {
         volume_size = "8"
         volume_type = "gp2"
     }
-
-    user_data = <<EOF
-#!/bin/bash
-sudo apt update -y
-sudo apt install -y apache2
-EOF
 
     tags = {
         Name = "webserver-2"

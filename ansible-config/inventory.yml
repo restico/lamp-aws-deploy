@@ -1,0 +1,12 @@
+webservers:
+  hosts:
+    ubuntu-server-1:
+      ansible_user: "ubuntu"
+      ansible_host: "ubuntu-server-1-address"
+      ansible_ssh_private_key_file: "../terrafrom-config/key-1.pem"
+      ansible_python_interpreter: "/usr/bin/python3"
+    ubuntu-server-2:
+      ansible_user: "ubuntu"
+      ansible_host: "ubuntu-server-2-address"
+      ansible_ssh_private_key_file: "../terrafrom-config/key-2.pem"
+      ansible_python_interpreter: "/usr/bin/python3"
