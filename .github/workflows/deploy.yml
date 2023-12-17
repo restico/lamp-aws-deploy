@@ -40,9 +40,8 @@ jobs:
 
       - name: Making inventory file
         run: |
-          cd ansible-config
-          sed -i "s/ubuntu-server-1-address/`terraform output -raw webserver-1-public-ip`/" ../ansible-config/inventory.yml
-          sed -i "s/ubuntu-server-2-address/`terraform output -raw webserver-2-public-ip`/" ../ansible-config/inventory.yml
+          sed -i "s/ubuntu-server-1-address/`terraform output -raw webserver-1-public-ip`/" ansible-config/inventory.yml
+          sed -i "s/ubuntu-server-2-address/`terraform output -raw webserver-2-public-ip`/" ansible-config/inventory.yml
 
       - name: Ansible Ping
         run: |
