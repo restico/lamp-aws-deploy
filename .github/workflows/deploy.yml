@@ -32,8 +32,8 @@ jobs:
           -auto-approve \
           -var "db_root_password=$DB_PASS" \
           -var "db_root_name=$DB_USER"
-          terraform output > outputs.txt
           echo `terraform -chdir=terraform-config output -raw load_balancer_address` >> "$GITHUB_STEP_SUMMARY"
+
 
       - name: Upload tfstate file
         uses: actions/upload-artifact@v3
