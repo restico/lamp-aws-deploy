@@ -1,6 +1,8 @@
 ---
 - name: Configuring Web Servers
   hosts: webservers
+  become: yes
+  become_method: sudo
 
   vars:
     project_dir: "/var/www/lamp"
@@ -15,7 +17,6 @@
         repo: "ppa:ondrej/php"
         state: present
         update_cache: yes
-      become: yes
 
     - name: Installing packages
       ansible.builtin.apt:
@@ -29,19 +30,16 @@
           - php8.2-xml
           - php8.2-mysql
         update_cache: yes
-      become: yes
 
     - name: Install the gpg key for nodejs LTS
       ansible.builtin.apt_key:
         url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
         state: present
-      become: yes
 
     - name: Install the nodejs LTS repos
       ansible.builtin.apt_repository:
         repo: "deb https://deb.nodesource.com/node_18.x {{ ansible_distribution_release }} main"
         state: present
-        update_cache: yes
 
     - name: Install Node.js and Apache
       ansible.builtin.apt:
@@ -49,51 +47,43 @@
           - apache2
           - nodejs
         update_cache: yes
-      become: yes
 
     - name: Install Composer
       ansible.builtin.get_url:
         url: "https://getcomposer.org/download/latest-stable/composer.phar"
         dest: "/usr/local/bin/composer"
         mode: 0755
-      become: yes
 
     - name: Add ubuntu user to www-group
       ansible.builtin.user:
         name: ubuntu
         groups: www-data
         append: yes
-      become: yes
 
     - name: Git Settings
       ansible.builtin.command:
         cmd: git config --global --add safe.directory /var/www/lamp
-      become: yes
 
     - name: Git Checkout
       ansible.builtin.git:
         repo: "https://github.com/Practical-DevOps/app-for-devops"
         dest: "{{ project_dir }}"
         force: yes
-      become: yes
 
     - name: Apache config
       ansible.builtin.template:
         src: data/lamp.conf.j2
         dest: /etc/apache2/sites-available/lamp.conf
-      become: yes
 
     - name: App Configuring
       ansible.builtin.template:
         src: data/app.conf.j2
         dest: "{{ project_dir }}/.env"
-      become: yes
 
     - name: Composer Run
       community.general.composer:
         command: install
         working_dir: "{{ project_dir }}"
-      become: yes
       environment:
         COMPOSER_ALLOW_SUPERUSER: 1
 
@@ -103,35 +93,29 @@
           php artisan key:generate
           php artisan migrate
         chdir: "{{ project_dir }}"
-      become: yes
 
     - name: Node build
       community.general.npm:
         path: "{{ project_dir }}"
         state: present
-      become: yes
 
     - name: Node run
       ansible.builtin.command:
         cmd: npm run build
         chdir: "{{ project_dir }}"
-      become: yes
 
     - name: Enable rewrite module
       community.general.apache2_module:
         name: rewrite
         state: present
-      become: yes
 
     - name: Disable default site
       ansible.builtin.command:
         cmd: a2dissite 000-default.conf
-      become: yes
 
     - name: Enable site
       ansible.builtin.command:
         cmd: a2ensite lamp.conf
-      become: yes
       notify: Restart Apache
 
     - name: Change ownership
@@ -141,14 +125,12 @@
         group: www-data
         mode: '0775'
         recurse: yes
-      become: yes
 
     - name: Setting firewall
       community.general.ufw:
         rule: allow
         direction: in
         name: Apache Full
-      become: yes
 
   handlers:
     - name: Restart Apache
