@@ -53,7 +53,7 @@ jobs:
           sed -i "s/ubuntu-server-1-address/$(terraform -chdir=terraform-config output -raw webserver-1-public-ip)/" ansible-config/inventory.yml
           sed -i "s/ubuntu-server-2-address/$(terraform -chdir=terraform-config output -raw webserver-2-public-ip)/" ansible-config/inventory.yml
           export DB_HOST=$(terraform output -raw mysql-hostname)
-          mysql -h $DB_HOST -u $DB_USER -p -e "CREATE DATABASE $DB_NAME;" <<< $DB_PASS
+          mysql -h $DB_HOST -u $DB_USER -p$"DB_PASS" -e "CREATE DATABASE $DB_NAME;"
 
       - name: Ansible Playbook
         run: |
