@@ -29,7 +29,12 @@
           - php8.2-intl
           - php8.2-xml
           - php8.2-mysql
+          - python3-pip
         update_cache: yes
+
+    - name: Installing mysql client for python
+      ansible.builtin.pip:
+        name: pymysql
 
     - name: Install the gpg key for nodejs LTS
       ansible.builtin.apt_key:
@@ -89,11 +94,25 @@
 
     - name: PHP Migrate
       ansible.builtin.shell:
-        cmd: |
-          php artisan key:generate
-          php artisan migrate
+        cmd: php artisan key:generate
         chdir: "{{ project_dir }}"
 
+    - name: Register database content
+      community.mysql.mysql_query:
+        query: "SELECT * FROM migrations;"
+        login_db: "{{ db_name }}"
+        login_host: "{{ db_host }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_pass }}"
+      register: migrations
+      ignore_errors: yes
+
+    - name: PHP Migrate
+      ansible.builtin.shell:
+        cmd: php artisan migrate
+        chdir: "{{ project_dir }}"
+      when: migration.query_result[0].id is not defined
+        
     - name: Node build
       community.general.npm:
         path: "{{ project_dir }}"
