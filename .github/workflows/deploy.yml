@@ -30,8 +30,10 @@ jobs:
           terraform -chdir=terraform-config \
           apply \
           -auto-approve \
-          -var 'db_root_password=$DB_PASS' \
-          -var 'db_root_name=$DB_USER'
+          -var "db_root_password=$DB_PASS" \
+          -var "db_root_name=$DB_USER"
+          terraform output > outputs.txt
+          echo `terraform -chdir=terraform-config output -raw load_balancer_address` >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload tfstate file
         uses: actions/upload-artifact@v3
@@ -48,9 +50,10 @@ jobs:
 
       - name: Making inventory file
         run: |
-          sed -i "s/ubuntu-server-1-address/$(terraform output -raw webserver-1-public-ip)/" ansible-config/inventory.yml
-          sed -i "s/ubuntu-server-2-address/$(terraform output -raw webserver-2-public-ip)/" ansible-config/inventory.yml
+          sed -i "s/ubuntu-server-1-address/$(terraform -chdir=terraform-config output -raw webserver-1-public-ip)/" ansible-config/inventory.yml
+          sed -i "s/ubuntu-server-2-address/$(terraform -chdir=terraform-config output -raw webserver-2-public-ip)/" ansible-config/inventory.yml
           export DB_HOST=$(terraform output -raw mysql-hostname)
+          mysql -h $DB_HOST -u $DB_USER -p -e "CREATE DATABASE $DB_NAME;" <<< $DB_PASS
 
       - name: Ansible Playbook
         run: |

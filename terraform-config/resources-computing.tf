@@ -72,7 +72,6 @@ resource "aws_db_instance" "mysql-database" {
 
     db_name                = var.db_name
     engine                 = "mysql"
-    engine_version         = "8.0.33"
     instance_class         = var.db_type
     allocated_storage      = 20
     max_allocated_storage  = 20
