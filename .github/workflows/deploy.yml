@@ -54,5 +54,6 @@ jobs:
 
       - name: Ansible Playbook
         run: |
-          ansible-playbook -i ansible-config/inventory.yml ansible-config/apache.yml \
+          cd ansible-config
+          ansible-playbook apache.yml \
           --extra-vars "db_host=$DB_HOST db_user=$DB_USER db_pass=$DB_PASSWORD db_name=$DB_NAME"
