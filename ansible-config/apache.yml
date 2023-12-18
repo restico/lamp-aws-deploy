@@ -1,6 +1,6 @@
 ---
 - name: Configuring Web Servers
-  hosts: webserver
+  hosts: webservers
 
   vars:
     project_dir: "/var/www/lamp"
