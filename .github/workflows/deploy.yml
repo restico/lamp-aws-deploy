@@ -13,7 +13,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       DB_USER: ${{ secrets.DB_USER }}
       DB_PASS: ${{ secrets.DB_PASS }}
-      DB_NAME: "lampStack"
+      DB_NAME: ${{ vars.DB_NAME}}
 
     steps:
       - name: Checkout
@@ -31,9 +31,10 @@ jobs:
           apply \
           -auto-approve \
           -var "db_root_password=$DB_PASS" \
-          -var "db_root_name=$DB_USER"
+          -var "db_root_name=$DB_USER" \
+          -var "db_name=$DB_NAME"
           echo `terraform -chdir=terraform-config output -raw load_balancer_address` >> "$GITHUB_STEP_SUMMARY"
-
+          export DB_HOST=$(terraform -chdir=terraform-config output -raw mysql-hostname)
 
       - name: Upload tfstate file
         uses: actions/upload-artifact@v3
@@ -52,11 +53,9 @@ jobs:
         run: |
           sed -i "s/ubuntu-server-1-address/$(terraform -chdir=terraform-config output -raw webserver-1-public-ip)/" ansible-config/inventory.yml
           sed -i "s/ubuntu-server-2-address/$(terraform -chdir=terraform-config output -raw webserver-2-public-ip)/" ansible-config/inventory.yml
-          export DB_HOST=$(terraform output -raw mysql-hostname)
-          mysql -h $DB_HOST -u $DB_USER -p$"DB_PASS" -e "CREATE DATABASE $DB_NAME;"
-
+          
       - name: Ansible Playbook
         run: |
           cd ansible-config
           ansible-playbook apache.yml \
-          --extra-vars "db_host=$DB_HOST db_user=$DB_USER db_pass=$DB_PASSWORD db_name=$DB_NAME"
+          --extra-vars "db_host=$DB_HOST db_user=$DB_USER db_pass=$DB_PASS db_name=$DB_NAME"
