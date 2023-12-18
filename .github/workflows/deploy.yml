@@ -25,7 +25,7 @@ jobs:
           terraform init
       
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var "db_root_password=${{ secrets.DB_PASS }}" -var "db_root_name=${{ secrets.DB_USER }}"
 
       - name: Upload tfstate file
         uses: actions/upload-artifact@v3
@@ -43,10 +43,16 @@ jobs:
       - name: Making inventory file
         run: |
           cd ansible-config
-          sed -i "s/ubuntu-server-1-address/`terraform output -raw webserver-1-public-ip`/" ../ansible-config/inventory.yml
-          sed -i "s/ubuntu-server-2-address/`terraform output -raw webserver-2-public-ip`/" ../ansible-config/inventory.yml
+          sed -i "s/ubuntu-server-1-address/$(terraform output -raw webserver-1-public-ip)/" ../ansible-config/inventory.yml
+          sed -i "s/ubuntu-server-2-address/$(terraform output -raw webserver-2-public-ip)/" ../ansible-config/inventory.yml
+          export DB_HOST=$(terraform output -raw mysql-hostname)
 
-      - name: Ansible Ping
+      - name: Ansible Playbook
         run: |
-          ansible webservers -i inventory.yml -m ping
+          ansible-playbook -i ansible-config/inventory.yml ansible-config/apache.yml \
+          --extra-vars "db_host=$DB_HOST db_user=$DB_USER db_pass=$DB_PASSWORD db_name=$DB_NAME"
+        env:
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_NAME: "lampStack"
       

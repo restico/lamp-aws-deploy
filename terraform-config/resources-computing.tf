@@ -70,7 +70,7 @@ resource "aws_instance" "webserver-2" {
 resource "aws_db_instance" "mysql-database" {
     identifier             = "mysql-database"
 
-    db_name                = "lampStack"
+    db_name                = var.db_name
     engine                 = "mysql"
     engine_version         = "8.0.33"
     instance_class         = var.db_type
@@ -110,7 +110,7 @@ resource "aws_elb" "lamp-loadbalancer" {
         healthy_threshold   = 2
         unhealthy_threshold = 2
         timeout             = 3
-        target              = "HTTP:80/index.html"
+        target              = "HTTP:80/index.php"
         interval            = 30
     }
 

@@ -24,16 +24,20 @@ variable "db_type" {
     default = "db.t2.micro"
 }
 
+variable "db_name" {
+    type        = string
+    default     = "lampStack"
+    description = "Database name"
+}
+
 variable "db_root_name" {
     type        = string
     sensitive   = true
-    default     = "admin"
     description = "Database root user name"
 }
 
 variable "db_root_password" {
     type        = string
     sensitive   = true
-    default     = "dbPa$$word"
     description = "Database root user password"
 }
