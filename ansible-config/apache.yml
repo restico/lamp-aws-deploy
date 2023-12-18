@@ -1,6 +1,6 @@
 ---
 - name: Configuring Web Servers
-  hosts: webserver
+  hosts: webservers
 
   vars:
     project_dir: "/var/www/lamp"
@@ -35,6 +35,7 @@
       ansible.builtin.apt_key:
         url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
         state: present
+      become: yes
 
     - name: Install the nodejs LTS repos
       ansible.builtin.apt_repository:
