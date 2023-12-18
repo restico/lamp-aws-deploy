@@ -124,7 +124,7 @@ resource "aws_security_group" "database-sg" {
 }
 
 resource "aws_db_subnet_group" "db-subnet-group" {
-    name        = "db-subnet-group"
+    name        = "subnet-group"
     subnet_ids  = [aws_subnet.lamp-subnet.id, aws_subnet.empty-subnet.id]
     description = "Subnet group"
 }

@@ -32,7 +32,7 @@ variable "db_name" {
 
 variable "db_root_name" {
     type        = string
-    sensitive   = true
+    sensitive   = false
     description = "Database root user name"
 }
 
