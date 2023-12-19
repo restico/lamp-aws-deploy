@@ -57,7 +57,7 @@
       ansible.builtin.get_url:
         url: "https://getcomposer.org/download/latest-stable/composer.phar"
         dest: "/usr/local/bin/composer"
-        mode: 0755
+        mode: 0775
 
     - name: Add ubuntu user to www-group
       ansible.builtin.user:
@@ -92,26 +92,10 @@
       environment:
         COMPOSER_ALLOW_SUPERUSER: 1
 
-    - name: PHP Migrate
+    - name: PHP Key Generate
       ansible.builtin.shell:
         cmd: php artisan key:generate
         chdir: "{{ project_dir }}"
-
-    - name: Register database content
-      community.mysql.mysql_query:
-        query: "SELECT * FROM migrations;"
-        login_db: "{{ db_name }}"
-        login_host: "{{ db_host }}"
-        login_user: "{{ db_user }}"
-        login_password: "{{ db_pass }}"
-      register: migrations
-      ignore_errors: yes
-
-    - name: PHP Migrate
-      ansible.builtin.shell:
-        cmd: php artisan migrate
-        chdir: "{{ project_dir }}"
-      when: migration.query_result[0].id is not defined
         
     - name: Node build
       community.general.npm:
@@ -132,7 +116,7 @@
       ansible.builtin.command:
         cmd: a2dissite 000-default.conf
 
-    - name: Enable site
+    - name: Enable our site
       ansible.builtin.command:
         cmd: a2ensite lamp.conf
       notify: Restart Apache
@@ -157,3 +141,28 @@
         name: apache2
         state: restarted
       become: yes
+
+- name: Migrations
+  hosts: ubuntu-server-1
+  become: yes
+  become_method: sudo
+
+  vars:
+    project_dir: "/var/www/lamp"
+
+  tasks:
+    - name: Register database content
+      community.mysql.mysql_query:
+        query: "SELECT * FROM migrations;"
+        login_db: "{{ db_name }}"
+        login_host: "{{ db_host }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_pass }}"
+      register: migrations
+      ignore_errors: yes
+
+    - name: PHP Migrate
+      ansible.builtin.shell:
+        cmd: php artisan migrate
+        chdir: "{{ project_dir }}"
+      when: not migrations.query_result
