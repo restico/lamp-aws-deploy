@@ -165,4 +165,4 @@
       ansible.builtin.shell:
         cmd: php artisan migrate
         chdir: "{{ project_dir }}"
-      when: not migrations.query_result
+      when: migrations.query_result[1] is not defined
