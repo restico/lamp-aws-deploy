@@ -34,7 +34,7 @@ jobs:
           -var "db_root_name=$DB_USER" \
           -var "db_name=$DB_NAME"
           echo `terraform -chdir=terraform-config output -raw load_balancer_address` >> "$GITHUB_STEP_SUMMARY"
-          export DB_HOST=$(terraform -chdir=terraform-config output -raw mysql-hostname)
+          echo "DB_HOST=$(terraform -chdir=terraform-config output -raw mysql-hostname)" >> $GITHUB_ENV
 
       - name: Upload tfstate file
         uses: actions/upload-artifact@v3
