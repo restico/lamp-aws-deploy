@@ -2,7 +2,7 @@
 
 [![Building Infrastructure](https://github.com/restico/lamp-aws-deploy/actions/workflows/deploy.yml/badge.svg)](https://github.com/restico/lamp-aws-deploy/actions/workflows/deploy.yml)
 
-**Project Site:** [GitHub](https://github.com/Practical-DevOps/app-for-devops)
+**Site used in project:** [GitHub](https://github.com/Practical-DevOps/app-for-devops)
 
 **Description:**
 The project is a web application built with PHP and the Laravel framework for the backend, NodeJS for the frontend, and MySQL as the database. The entire CI/CD pipeline is organized using GitHub Actions, and the deployment involves setting up AWS infrastructure using Terraform (Infrastructure as Code) and configuring the web servers (EC2 instances) with Ansible.
